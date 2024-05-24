@@ -1,0 +1,15 @@
+{
+  "name": "ultimate-project",
+  "version": "1.0.0",
+  "description": "complete backend project",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "author": "Shane Ahmad",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
