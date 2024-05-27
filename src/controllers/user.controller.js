@@ -19,19 +19,22 @@ const registerUser = asyncHandler(async (req, res, next) => {
     // check for user creation
     // return response
     const {fullname, username, email, password} = req.body;
-    console.log(fullname, username, email, password);
+    // console.log(fullname, username, email, password);
     if(fullname === '' || username === '' || email === '' || password === ''){
         res.status(400);
         throw new ApiErrors(400, 'All fields are required');
     }
-    const existedUser = User.findOne({$or: [{email}, {username}]});
+    const existedUser = await User.findOne({$or: [{email}, {username}]});
     if(existedUser){
         throw new ApiErrors(409, 'User already exists');
     }
     
     const avatarLocalPAth = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    let coverImageLocalPath;
 
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
     if(!avatarLocalPAth){
         throw new ApiErrors(400, 'Avatar is required');
     }
@@ -40,13 +43,13 @@ const registerUser = asyncHandler(async (req, res, next) => {
     if(!avatar){
         throw new ApiErrors(500, 'Avatat upload failed');
     }
-    const user = User.create({
+    const user = await User.create({
         fullname,
         username: username.toLowerCase(),
         email,
         password,
         avatar: avatar.url,
-        coverImage: coverImage.url || "",
+        coverImage: coverImage?.url || "",
     });
     const createdUser = await User.findById(user._id).select('-password -refreshToken');
     if(!createdUser){
